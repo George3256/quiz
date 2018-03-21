@@ -38,12 +38,13 @@ public class Main_scr : MonoBehaviour {
     public GameObject ContainerMenu;
     public Button ButtonStart;
 
+    //Для контейнера результата:
+    public GameObject ContainerResult;
 
     void Start ()
     {
-        //InitializationTest();
         listTest = new List<TestCase>(TestCase.generateTestCases(Tests));
-        ContainerTests.SetActive(false);
+        toMainMenu();
     }
     public void OnClickButtonStart()
     {
@@ -65,7 +66,7 @@ public class Main_scr : MonoBehaviour {
     }
     public void ButtonOnClick(int index)
     {
-        if (IsClick)
+        /*if (IsClick)
         {
             if (ButtonAnswer[index].GetComponentInChildren<Text>().text == listTestTmp[CurrentQuestion].CorrectAnswer)
             {
@@ -78,7 +79,10 @@ public class Main_scr : MonoBehaviour {
                 IsClick = false;
             }
         }
-        else NextQuestion();
+        else NextQuestion();*/
+        string choosenAnswer = ButtonAnswer[index].GetComponentInChildren<Text>().text;
+        listTestTmp[CurrentQuestion].checkAnswer(choosenAnswer);
+        NextQuestion();
     }
 
     public void NextQuestion()
@@ -86,19 +90,84 @@ public class Main_scr : MonoBehaviour {
         if (listTestTmp.Count > 1)
         {
             listTestTmp.RemoveAt(CurrentQuestion);
-            ButtonAnswer[2].image.color = Color.white;
-            ButtonAnswer[1].image.color = Color.white;
-            ButtonAnswer[0].image.color = Color.white;
+            //ButtonAnswer[2].image.color = Color.white;
+            //ButtonAnswer[1].image.color = Color.white;
+            //ButtonAnswer[0].image.color = Color.white;
             CurrentQuestion = UnityEngine.Random.Range(0, listTestTmp.Count - 1);
             ViewQuestion(CurrentQuestion);
             IsClick = true;
         }
         else
         {
-            ContainerTests.SetActive(false);
-            ContainerMenu.SetActive(true);
+            toResults();
         }
     }
+
+    public void toMainMenu()
+    {
+        ContainerResult.SetActive(false);
+        ContainerTests.SetActive(false);
+        ContainerMenu.SetActive(true);
+        TestCase.clearResult();
+    }
+
+    private void toResults()
+    {
+        //set active:
+        ContainerResult.SetActive(true);
+        ContainerTests.SetActive(false);
+        ContainerMenu.SetActive(false);
+        //fill text:
+        int type = TestCase.getType();
+        Results.Result r = Results.getResult(type);
+        string title = r.title;
+        string[] description = r.description.Split(new string[] { "Советы: " }, System.StringSplitOptions.None);
+        string desc = description[0];
+        string adv = description[1];
+        UnityEngine.Object o = GameObject.Find("TextTitle");
+        o = GameObject.Find("TextTitle").GetComponent<Text>();
+        GameObject.Find("TextTitle").GetComponent<Text>().text = "Ваш результат: " + title;
+        GameObject.Find("TextDescription").GetComponent<Text>().text = desc;
+        GameObject.Find("TextAdvise").GetComponent<Text>().text = "Советы: " + adv;
+        //clear counters:
+        TestCase.clearResult();
+    }
+
+    public void testFill(int number)
+    {
+        ContainerResult.SetActive(true);
+        ContainerTests.SetActive(false);
+        ContainerMenu.SetActive(false);
+        //fill text:
+        Results.Result r = Results.getResult(number);
+        string title = r.title;
+        string[] description = r.description.Split(new string[] { "Советы: " }, System.StringSplitOptions.None);
+        string desc = description[0];
+        string adv = description[1];
+        UnityEngine.Object o = GameObject.Find("TextTitle");
+        o = GameObject.Find("TextTitle").GetComponent<Text>();
+        GameObject.Find("TextTitle").GetComponent<Text>().text = "Ваш результат: " + title;
+        GameObject.Find("TextDescription").GetComponent<Text>().text = desc;
+        GameObject.Find("TextAdvise").GetComponent<Text>().text = "Советы: " + adv;
+    }
+
+    public void test1()
+    {
+        testFill(0);
+    }
+    public void test2()
+    {
+        testFill(1);
+    }
+    public void test3()
+    {
+        testFill(2);
+    }
+    public void test4()
+    {
+        testFill(3);
+    }
+
     public void OnClickAll()
     {
         Application.OpenURL("market://details?id=com.company.game");

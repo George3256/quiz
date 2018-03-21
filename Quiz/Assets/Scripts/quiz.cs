@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 public class TestCase
 {
-	public string Question {get;set;}
+    static private int[] TYPE_COUNTERS = new int[] { 0, 0, 0, 0 };
+    public string Question {get;set;}
 	public List<string>  Answers {get;set;}
 	public string CorrectAnswer {get;set;}
 
@@ -21,6 +22,21 @@ public class TestCase
             result[i] = new TestCase(stringTestCases[i]);
         }
         return result;
+    }
+
+    public static int getType()
+    {
+        int maxVal = TYPE_COUNTERS[0];
+        int maxI = 0;
+        for(int i=1; i< TYPE_COUNTERS.Length; i++)
+        {
+            if(TYPE_COUNTERS[i] > maxVal)
+            {
+                maxVal = TYPE_COUNTERS[i];
+                maxI = i;
+            }
+        }
+        return maxI;
     }
 
     /// <summary>
@@ -41,6 +57,23 @@ public class TestCase
             answersList[index2] = bucket;
         }
         return answersList.ToArray();
+    }
+
+    public void checkAnswer(string answer)
+    {
+        for(int i = 0; i < Answers.Capacity; i++)
+        {
+            if (answer.Equals(Answers[i]))
+            {
+                TYPE_COUNTERS[i]++;
+                return;
+            }
+        }
+    }
+
+    public static void clearResult()
+    {
+        TYPE_COUNTERS = new int[] { 0, 0, 0, 0 };
     }
     
 	public TestCase(string str)

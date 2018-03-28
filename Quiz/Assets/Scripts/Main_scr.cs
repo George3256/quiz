@@ -5,7 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Main_scr : MonoBehaviour {
-    
+
+    private bool inMainMenu;
     // для контейнера тестов
     public GameObject ContainerTests;
     public Text TextQuestion;
@@ -46,6 +47,19 @@ public class Main_scr : MonoBehaviour {
         listTest = new List<TestCase>(TestCase.generateTestCases(Tests));
         toMainMenu();
     }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (inMainMenu)
+            {
+                Application.OpenURL("https://play.google.com/store/apps/dev?id=8151310720269665513");
+            }
+            else toMainMenu();
+        }
+    }
+
     public void OnClickButtonStart()
     {
         listTestTmp = new List<TestCase>(listTest);
@@ -54,10 +68,16 @@ public class Main_scr : MonoBehaviour {
         CurrentQuestion = UnityEngine.Random.Range(0, listTestTmp.Count - 1);
         ViewQuestion(CurrentQuestion);
         IsClick = true;
+        inMainMenu = false;
     }
     void ViewQuestion(int i)
-    { 
-        TextQuestion.text = listTestTmp[i].Question;
+    {
+        //текст вопроса:
+        int curNumber = listTest.Count - listTestTmp.Count + 1;
+        int maxNumber = listTest.Count;
+        string curNumberStr = "( " + curNumber + " / " + maxNumber + " ) ";
+        TextQuestion.text = curNumberStr + listTestTmp[i].Question;
+        //текст ответов:
         string[] answersRandom = listTestTmp[i].getAnswersRandom();
         for(int j=0; j<ButtonAnswer.Length; j++)
         {
@@ -66,20 +86,6 @@ public class Main_scr : MonoBehaviour {
     }
     public void ButtonOnClick(int index)
     {
-        /*if (IsClick)
-        {
-            if (ButtonAnswer[index].GetComponentInChildren<Text>().text == listTestTmp[CurrentQuestion].CorrectAnswer)
-            {
-                ButtonAnswer[index].image.color = Color.green;
-                IsClick = false;
-            }
-            else
-            {
-                ButtonAnswer[index].image.color = Color.red;
-                IsClick = false;
-            }
-        }
-        else NextQuestion();*/
         string choosenAnswer = ButtonAnswer[index].GetComponentInChildren<Text>().text;
         listTestTmp[CurrentQuestion].checkAnswer(choosenAnswer);
         NextQuestion();
@@ -90,9 +96,6 @@ public class Main_scr : MonoBehaviour {
         if (listTestTmp.Count > 1)
         {
             listTestTmp.RemoveAt(CurrentQuestion);
-            //ButtonAnswer[2].image.color = Color.white;
-            //ButtonAnswer[1].image.color = Color.white;
-            //ButtonAnswer[0].image.color = Color.white;
             CurrentQuestion = UnityEngine.Random.Range(0, listTestTmp.Count - 1);
             ViewQuestion(CurrentQuestion);
             IsClick = true;
@@ -109,6 +112,7 @@ public class Main_scr : MonoBehaviour {
         ContainerTests.SetActive(false);
         ContainerMenu.SetActive(true);
         TestCase.clearResult();
+        inMainMenu = true;
     }
 
     private void toResults()
@@ -131,6 +135,8 @@ public class Main_scr : MonoBehaviour {
         GameObject.Find("TextAdvise").GetComponent<Text>().text = "Советы: " + adv;
         //clear counters:
         TestCase.clearResult();
+        //
+        inMainMenu = false;
     }
 
     public void testFill(int number)
@@ -170,10 +176,14 @@ public class Main_scr : MonoBehaviour {
 
     public void OnClickAll()
     {
-        Application.OpenURL("market://details?id=com.company.game");
+        Application.OpenURL("https://play.google.com/store/apps/dev?id=8151310720269665513");
     }
     public void OnClickEstimate()
     {
-        Application.OpenURL("market://details?id=com.company.game");
+        Application.OpenURL("market://details?id=" + Application.identifier);
+    }
+    public void OnClickExit()
+    {
+        Application.Quit();
     }
 }
